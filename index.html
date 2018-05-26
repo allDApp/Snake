@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8">
+	<title>星云贪吃蛇-Greedy Snake</title>
+	<meta name="renderer" content="webkit">
+	<meta name="keywords" content="贪吃蛇" />
+	<meta name="description" content="" />
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		@font-face {
+			font-family: Minecraft;
+			src: url(./fonts/Minecraft.eot);
+			src: local('☺'), url(./fonts/Minecraft.woff) format('woff'), url(./fonts/Minecraft.ttf) format('truetype'), url(./fonts/Minecraft.svg) format('svg');
+			font-weight: 400;
+			font-style: normal
+		}
+
+		body {
+			background: black;
+		}
+
+		ul,
+		li {
+			list-style: none;
+		}
+
+		/* 950 940 */
+
+		#container {
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			width: 950px;
+			height: 484px;
+			border: 5px solid #365510;
+			margin-top: -242px;
+			margin-left: -475px;
+			overflow: hidden;
+		}
+
+		.containerBg {
+			background: #97c13d;
+		}
+
+		.containerBgBlink {
+			background: #91FF47;
+		}
+
+		#container ul {
+			position: absolute;
+			top: 0;
+			margin-left: -2px;
+			margin-right: -2px;
+		}
+
+		#container li {
+			float: left;
+			width: 17px;
+			height: 17px;
+			border-right: 1px solid #8ab333;
+			border-bottom: 1px solid #8ab333;
+		}
+
+		#header {
+			/*position: relative;*/
+			width: 100%;
+			height: 67px;
+			overflow: hidden;
+		}
+
+		.greedy {
+			position: absolute;
+			left: 50%;
+			top: 24px;
+			z-index: 2;
+			width: 258px;
+			height: 28px;
+			margin-left: -129px;
+			background: url(picture/greedy.png) no-repeat;
+		}
+
+		.into {
+			position: absolute;
+			width: 87px;
+			height: 31px;
+			top: 17px;
+			right: 17px;
+			z-index: 2;
+		}
+
+		#main {
+			/*position: relative;*/
+		}
+
+		.info1 {
+			position: absolute;
+			left: 50%;
+			top: 100px;
+			margin-left: -170px;
+			width: 340px;
+			height: 0;
+			z-index: 2;
+			background: url(picture/info1.png) no-repeat;
+		}
+
+		.info2 {
+			position: absolute;
+			left: 50%;
+			margin-left: -369px;
+			top: 165px;
+			width: 738px;
+			height: 0;
+			z-index: 2;
+			background: url(picture/info2.png) no-repeat;
+		}
+
+		.help {
+			position: absolute;
+			left: 50%;
+			top: 350px;
+			/*margin-left: -150px;*/
+			margin-left: -186px;
+			/*width: 300px;*/
+			width: 372px;
+			height: 0;
+			z-index: 2;
+			background: url(picture/help.png) no-repeat;
+		}
+
+		.start,
+		.share {
+			position: absolute;
+			left: 250px;
+			bottom: 50px;
+			z-index: 3;
+		}
+
+		.text729 {
+			position: absolute;
+			width: 260px;
+			height: 0;
+			left: 340px;
+			top: 180px;
+			/*top: -100px;*/
+			background: url(picture/729.png) no-repeat;
+			/*top: 180px;*/
+			z-index: 2;
+		}
+
+		.text729.slideDown {
+			top: 180px;
+			/*transition: top 2s;*/
+			/*-webkit-transition: top 2s;*/
+		}
+
+
+		.success {
+			position: absolute;
+			right: 265px;
+			bottom: 186px;
+			z-index: 2;
+		}
+
+		/*.food {*/
+
+		/*position: absolute;*/
+
+		/*top: 90px;*/
+
+		/*left: 17px;*/
+
+		/*}*/
+
+		.up {
+			position: absolute;
+			right: 250px;
+			bottom: 50px;
+			z-index: 3;
+		}
+
+		.on-score {
+			position: absolute;
+			font-family: 'Minecraft';
+			color: #365510;
+			letter-spacing: 5px;
+			left: 30px;
+			top: 20px;
+			z-index: 2;
+			font-size: 30px;
+			width: 100px;
+			height: 30px;
+			line-height: 30px;
+		}
+
+		.header-bottom {
+			position: absolute;
+			z-index: 2;
+			width: 100%;
+			height: 5px;
+			background: url(picture/header-bottom.png) repeat-x;
+		}
+
+		/*蛇*/
+
+		#J_playground {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			z-index: 2;
+			top: 71px;
+			/*background: rgba(255,0,0,.5);*/
+		}
+
+		#J_playground ul {
+			/*margin: 0;*/
+		}
+
+		#J_playground ul li {
+			/*border-right: 1px solid red;*/
+			/*border-bottom: 1px solid red;*/
+		}
+
+
+		.food {
+			background: url(picture/food.png);
+			/*background-color: #99FF00;*/
+		}
+
+		.snake {
+			background: #2e5008;
+		}
+
+		.dn {
+			display: none;
+		}
+
+		.cur {
+			cursor: pointer
+		}
+	</style>
+	    <script src="./js/jquery.min.js"></script> 
+		<script src="./js/bootstrap.min.js"></script> 
+		<script src="./js/index.js"></script> 
+		<script src="./js/nebPay.js"></script> 
+</head>
+
+<body>
+
+	<div id="container" class="containerBg">
+		<div class="bdsharebuttonbox" data-tag="share_1">
+			<a href="javascript:;" data-cmd="tsina"></a>
+		</div>
+		<div id="header">
+			<div class="greedy"></div>
+			<div class="into">
+				<a target="_blank" href="https://nebulas.io/">
+					<img src="picture/into.png" alt="官网" />
+				</a>
+			</div>
+			<div class="on-score" id="sco">000</div>
+		</div>
+		<div class="header-bottom"></div>
+		<div id="main">
+			<div class="info1"></div>
+			<div class="info2"></div>
+			<div class="help"></div>
+			<div class="start dn">
+				<img class="cur" src="picture/start.png" alt="开始" />
+			</div>
+			<div class="share dn">
+				<!--<a target="_blank" >-->
+				<a target="_blank" href="javascript:void(0)">
+					<img  class="cur"src="picture/share.png" href="javascript:void(0)" id="create" alt="上传成绩" />
+				</a>
+			</div>
+		</div>
+		<div class="up dn">
+			<a target="_blank" href="https://alldapp.github.io/Snake/up">
+				<img src="picture/up.png" alt="开发者" />
+			</a>
+		</div>
+		<div class="food dn">
+			<img src="picture/food.png" alt="食物" />
+		</div>
+		<div class="text729"></div>
+		<div class="success dn">
+			<img src="picture/success.png" alt="成功" />
+		</div>
+		<div id="J_playground" class="com-playground block">
+			<!-- 游戏界面会生成到含id=J_playground的元素里 -->
+		</div>
+	</div>
+	<div class="post-head">
+			<h1 class="post-title" style="color:#8ab333">
+				<a>星云贪吃蛇-Greedy Snake</a>
+			</h1>
+			<div class="post-meta" style="color:#91FF47">
+				<span>简单有趣的小游戏，难度随时间增加而增长。<br>快来与你的小伙伴一较高下吧！</span> •
+			</div>
+		</div>
+	<div  id="main-menu =">
+			<li id="all" class="nav-current" role="presentation">
+				<a href="javascript:void(0)">最新玩家成绩</a>
+			</li>
+	</div>
+
+		<div class="post-content">
+			<div>
+				<div class="panel panel-success">
+					<div id="searchresult" style="min-height:450px; height:auto!important;color: greenyellow">
+						<div class="panel-body">
+							加载中...
+						</div>
+					</div>
+				</div>
+			</div>
+
+	<script>
+		var container = document.getElementById('container');
+		var headerObj = document.getElementById('header');
+		var mainObj = document.getElementById('main');
+		var Lis = new Array(1432);
+		var Ul = document.createElement('ul');
+		var LisStr = Lis.join('<li></li>');
+		Ul.innerHTML = LisStr;
+		container.appendChild(Ul);
+
+		var info1Obj = getClassObj('info1');
+		var info2Obj = getClassObj('info2');
+		var helpObj = getClassObj('help');
+		var startObj = getClassObj('start');
+		var upObj = getClassObj('up');
+		var foodObj = getClassObj('food');
+		var shareObj = getClassObj('share');
+		var text729Obj = getClassObj('text729');
+		var successObj = getClassObj('start');
+		var scoreObj = getClassObj('on-score');
+		var bdsharebuttonboxObj = getClassObj('bdsharebuttonbox');
+
+		var info1Height = 1,
+			info2Height = 1,
+			helpHeight = 1,
+			text729Height = 1;
+
+		var info1dt = setInterval(function () {
+
+			info1Obj.style.height = info1Height + 'px';
+			info1Height += 40;
+			if (info1Height > 80) { // 162
+				clearInterval(info1dt);
+				var info2dt = setInterval(function () {
+					info2Obj.style.height = info2Height + 'px';
+					info2Height += 40;
+					if (info2Height > 180) { // 162
+						clearInterval(info2dt);
+						var helpdt = setInterval(function () {
+							helpObj.style.height = helpHeight + 'px';
+							helpHeight += 40;
+							if (helpHeight > 60) { // 162
+								clearInterval(helpdt);
+
+								setTimeout(function () {
+									startObj.style.display = 'block';
+									upObj.style.display = 'block';
+								}, 1000)
+							}
+						}, 150);
+					}
+				}, 150);
+			}
+		}, 150);
+
+		var tcs = function () {
+			var _options = {
+				nX: 23, //排数
+				nY: 53, //列数
+				nLiWidth: 18, //单个像素点宽度
+				nDefaultSpeed: 100, //初始化速度
+				classSnake: 'snake',
+				classFood: 'food',
+				oPlayGround: document.getElementById('J_playground')
+			};
+			//像素点集合数组
+			var aLi = new Array();
+			//贪吃蛇
+			var snake = new Array();
+			//蛇长
+			var nSnakeLen = 1;
+			//移动方向、预载移动方向
+			var direction = preDirection = [0, 1];
+			//移动速度
+			var speed = _options.nDefaultSpeed;
+			//是否在移动、是否暂停、是否已经绑定过事件
+			var bHasBegin = bPause = bHasInit = false;
+			//计时器
+			var timer;
+			var FoodNum = 25;
+			/**
+			 * 生成地图
+			 * @function _createMap
+			 * @return (void)
+			 * @private
+			 */
+			var _createMap = function () {
+				if (typeof map != 'undefined') {
+					_options.oPlayGround.removeChild(map);
+				}
+				//地图对象map
+				map = document.createElement("ul");
+
+				for (var i = 0; i < _options.nX; i++) {
+					aLi[i] = new Array();
+					for (var j = 0; j < _options.nY; j++) {
+						var li = document.createElement("li");
+						aLi[i][j] = li;
+						map.appendChild(li);
+					}
+				}
+				map.style.width = _options.nLiWidth * _options.nY + 'px';
+				map.style.height = _options.nLiWidth * _options.nX + 'px';
+				_options.oPlayGround.appendChild(map);
+			}
+			/**
+			 * 生成贪吃蛇
+			 * @function _createSnake
+			 * @return (void)
+			 * @private
+			 */
+			var _createSnake = function () {
+				var x = Math.floor(Math.random() * _options.nX);
+				var y = Math.floor(Math.random() * _options.nY);
+				snake = [[11, 26]];
+				//snake = [[x,y]];
+				//蛇长
+				nSnakeLen = snake.length;
+				for (var i = nSnakeLen - 1; i > -1; i--) {
+					var x = snake[i][0];
+					var y = snake[i][1];
+					aLi[x][y].className = _options.classSnake;
+				}
+			}
+
+			var _reset = function (arr) {
+				bHasBegin = false;
+				_createMap();
+				//var lis = document.getElementById('J_playground').document.querySelectorAll('li');
+				//for(var k = 0, kLen = lis.length; kLen < kLen; kLen += 1){
+				//    if(lis[k].getAttribute('class').indexOf('snake') != -1){
+				//
+				//    }
+				//}
+				//return;
+
+				// 11行  26列
+				var newArr = [];
+				for (var i = 0, iLen = arr.length; i < iLen; i += 1) {
+					var x26 = 26 - i;
+					newArr.push([11, x26]);
+				}
+
+				var len = newArr.length;
+				for (var j = len - 1; j > -1; j--) {
+					var x = newArr[j][0];
+					var y = newArr[j][1];
+					aLi[x][y].className = _options.classSnake;
+				}
+				snake = newArr;
+				direction = preDirection = [0, 1];
+				_createFood();
+				_moveSnake()
+			};
+			/**
+			 * 生成食物
+			 * @function _createFood
+			 * @return (void)
+			 * @private
+			 */
+
+			var _createFood = function () {
+				for (var i = 0; i < FoodNum - snake.length + 1; i += 1) {
+					var x = Math.floor(Math.random() * _options.nX);
+					var y = Math.floor(Math.random() * _options.nY);
+
+					if (aLi[x][y].className != _options.classSnake && aLi[x][y].className != _options.classFood) {
+						aLi[x][y].className = _options.classFood;
+					} else {
+						//_createFood();
+						i -= 1;
+						continue;
+					}
+				}
+
+			}
+			/**
+			 * 蛇移动
+			 * @function _createFood
+			 * @return (void)
+			 * @private
+			 */
+			var _moveSnake = function () {
+				if (_syncStatus()) {
+					return
+				}
+				bHasBegin = true;
+				direction = preDirection;
+				var nextX = snake[0][0] + direction[0];
+				var nextY = snake[0][1] + direction[1];
+
+				if (nextX > _options.nX - 1 || nextY > _options.nY - 1 || nextX < 0 || nextY < 0 || aLi[nextX][nextY].className == _options.classSnake) {
+					_gameOver();
+					return;
+				}
+
+				snake.unshift([nextX, nextY])
+
+				if (aLi[nextX][nextY].className == _options.classFood) {
+					//_createFood();
+				} else {
+					aLi[snake[nSnakeLen][0]][snake[nSnakeLen][1]].className = '';
+					snake.pop();
+				}
+
+				aLi[nextX][nextY].className = _options.classSnake;
+				nSnakeLen = snake.length;
+				_changeSpeed(nSnakeLen);
+
+				timer = window.setTimeout(_moveSnake, speed);
+
+
+			}
+			/**
+			 * 状态同步
+			 * @function _syncStatus
+			 * @return (void)
+			 * @private
+			 */
+			var _syncStatus = function () {
+				if (nSnakeLen === 1) {
+					scoreObj.innerHTML = '000';
+				} else {
+					var score = (nSnakeLen - 1) * 15;
+					scoreObj.innerHTML = score < 100 ? '0' + score : score;
+				}
+				//            document.getElementById("J_nSnakeLen").innerHTML = nSnakeLen - 1;
+				//            document.getElementById("J_speed").innerHTML = speed;
+				//            document.getElementById("J_gamestatus").innerHTML = "进行中…";
+			}
+			/**
+			 * 改变移动速度
+			 * @function _changeSpeed
+			 * @return (void)
+			 * @private
+			 */
+			var _changeSpeed = function (n) {
+				speed = _options.nDefaultSpeed - parseInt(n / 10) * 25;
+			};
+			/**
+			 * 改变移动方向
+			 * @function _changePreDirection
+			 * @return (void)
+			 * @private
+			 */
+			var _changePreDirection = function (keycode) {
+				switch (keycode) {
+					case 37:
+						//为什么 direction == [0,1]不成立
+						preDirection = (direction[0] == 0 && direction[1] == 1 && nSnakeLen != 1) ? [0, 1] : [0, -1];
+						break;
+					case 38:
+						preDirection = (direction[0] == 1 && direction[1] == 0 && nSnakeLen != 1) ? [1, 0] : [-1, 0];
+						break;
+						break;
+					case 39:
+						preDirection = (direction[0] == 0 && direction[1] == -1 && nSnakeLen != 1) ? [0, -1] : [0, 1];
+						break;
+					case 40:
+						preDirection = (direction[0] == -1 && direction[1] == 0 && nSnakeLen != 1) ? [-1, 0] : [1, 0];
+						break;
+					default:
+						break;
+				}
+			}
+			/**
+			 * 游戏结束
+			 * @function _gameOver
+			 * @return (void)
+			 * @private
+			 */
+			var _gameOver = function () {
+				bgBlink();
+				//document.getElementById("J_gamestatus").innerHTML = "游戏结束";
+				//document.getElementById("J_restartBtn").style.display = "block";
+				setTimeout(function () {
+					window.clearTimeout(timer);
+					J_playground.innerHTML = '';
+
+					var textdt = setInterval(function () {
+						//if (text729Height > 95)
+						//text729Height = text729Height > 95 ? 95 : text729Height;
+						text729Obj.style.height = text729Height + 'px';
+						text729Height += 10;
+						if (text729Height > 105) {
+							clearInterval(textdt);
+							setTimeout(function () {
+								shareObj.style.display = 'block';
+								upObj.style.display = 'block';
+							}, 500);
+						}
+					}, 200);
+					//text729Obj.setAttribute('class','text729 slideDown');
+					//bgBlink();
+				}, 1000);
+				return true};
+			/**
+			 * 绑定按键事件
+			 * @function _bindEvents
+			 * @return (void)
+			 * @private
+			 */
+			var _bindEvents = function () {
+
+				if (bHasInit) return;
+
+				bHasInit = true;
+				document.onkeydown = function (e) {
+					var ev = window.event || e;
+					var keycode = ev.keyCode || ev.which || ev.charCode;
+					if (keycode == 32 && bHasBegin) {
+						bPause = bPause ? false : true;
+						if (!bPause) {
+							timer = window.setTimeout(_moveSnake, speed);
+						}
+					}
+					if (bPause) {
+						window.clearTimeout(timer);
+						//document.getElementById("J_gamestatus").innerHTML = "已暂停…";
+						return;
+					} else {
+						if (keycode == 37 || keycode == 38 || keycode == 39 || keycode == 40) {
+							_changePreDirection(keycode);
+							if (!bHasBegin) {
+								_moveSnake();
+							}
+						}
+					}
+				}
+
+			}
+			return {
+				restart: function () {
+
+					bHasBegin = false;
+					_createMap();
+					_bindEvents();
+					_createSnake();
+					_createFood();
+
+					//                document.getElementById("J_gamestatus").innerHTML = "准备开始";
+					//                document.getElementById("J_restartBtn").style.display = "none";
+
+				},
+
+				/**
+				 * 参数设置
+				 * @function renew
+				 * @return (void)
+				 * @public
+				 */
+				setOptions: function () {
+					_options.nX = document.getElementById("J_nX").value;
+					_options.nY = document.getElementById("J_nY").value;
+					_options.nDefaultSpeed = document.getElementById("J_nDefaultSpeed").value;
+				}
+
+			}
+		}();
+
+
+		//    开始游戏
+		startObj.onclick = function () {
+			info1Obj.style.display = 'none';
+			info2Obj.style.display = 'none';
+			helpObj.style.display = 'none';
+			startObj.style.display = 'none';
+			upObj.style.display = 'none';
+			tcs.restart();
+		};
+
+
+
+		function bgBlink() {
+			var i = 1;
+			var dt = setInterval(function () {
+				if (i == 8) {
+					clearInterval(dt);
+				}
+				var bgClass = container.getAttribute('class');
+				var onClass = bgClass == 'containerBg' ? 'containerBgBlink' : 'containerBg';
+				container.setAttribute('class', onClass);
+				i += 1;
+
+			}, 100);
+
+
+		}
+
+		// 获取类对象
+		function getClassObj(className) {
+			var parentObj = document.getElementById('container');
+			if (parentObj.querySelector) {
+				return parentObj.querySelector('.' + className);
+			} else {
+				var divs = parentObj.getElementsByTagName('div');
+				for (var i = 0, len = divs.length; i < len; i += 1) {
+					if (divs[i].getAttribute('class') == className) {
+						return divs[i];
+					}
+				}
+			}
+		}
+
+        $(document).ready(function () {
+            var menuYloc = $("#mynav").offset().top - 110; //此ID为随着屏幕滚动div的ID
+            $(window).scroll(function () {
+                var offsetTop = menuYloc + $(window).scrollTop() + "px";
+                //$("#mynav").css("top",offsetTop);
+                $("#mynav").animate({ top: offsetTop }, { duration: 50, queue: false }); //此ID为随着屏幕滚动div的ID
+            });
+        });
+
+
+	</script>
+
+</body>
+
+</html>
